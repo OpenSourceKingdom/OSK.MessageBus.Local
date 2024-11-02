@@ -43,10 +43,9 @@ namespace OSK.MessageBus.Local.Internal.Services
 
             var topicMessages = _messageEvents.GetOrAdd(message.TopicId, new ConcurrentDictionary<Guid, LocalMessage>());
             topicMessages.AddOrUpdate(Guid.NewGuid(), 
-                addValueFactory: messageId => new LocalMessage()
+                addValueFactory: messageId => new LocalMessage(message)
                 {
                     Id = messageId,
-                    MessageEvent = message,
                     TriggerTime = options.DelayTimeSpan > TimeSpan.Zero
                      ? DateTime.Now.Add(options.DelayTimeSpan)
                      : null
