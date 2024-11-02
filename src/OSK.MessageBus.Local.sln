@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35312.102
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OSK.MessageBus.Local", "OSK.MessageBus.Local\OSK.MessageBus.Local.csproj", "{4A9A183C-4E0E-4D96-931A-6A553D9DBD9D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OSK.MessageBus.Local.UnitTests", "OSK.MessageBus.Local.UnitTests\OSK.MessageBus.Local.UnitTests.csproj", "{86F96A2E-2283-4DD8-B169-0531627A0444}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4A9A183C-4E0E-4D96-931A-6A553D9DBD9D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A9A183C-4E0E-4D96-931A-6A553D9DBD9D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4A9A183C-4E0E-4D96-931A-6A553D9DBD9D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4A9A183C-4E0E-4D96-931A-6A553D9DBD9D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{86F96A2E-2283-4DD8-B169-0531627A0444}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{86F96A2E-2283-4DD8-B169-0531627A0444}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{86F96A2E-2283-4DD8-B169-0531627A0444}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{86F96A2E-2283-4DD8-B169-0531627A0444}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {36844ACA-A4D2-4A14-A467-6BE516FEE37A}
+	EndGlobalSection
+EndGlobal
