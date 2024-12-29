@@ -10,6 +10,10 @@
 		<PackageTags>OpenSourceKingdom, OpenSource, implementation, local, localhost, Communication, Message, Bus, Architecture, Async, Event, Consistency, Network, Api</PackageTags>
 		<Authors>BlankDev117</Authors>
 		<Title>OSK.MessageBus.Local</Title>
+
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<NoWarn>CS1591</NoWarn>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
 	</PropertyGroup>
 
 	<PropertyGroup>
@@ -17,6 +21,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<None Include="..\..\README.md" Pack="true" PackagePath="\" />
 		<PackageReference Include="OSK.MessageBus.Application" Version="0.2.0" />
 		<PackageReference Include="OSK.MessageBus" Version="0.2.0" />
 	</ItemGroup>

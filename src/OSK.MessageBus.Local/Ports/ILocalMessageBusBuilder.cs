@@ -3,15 +3,14 @@ using OSK.MessageBus.Abstractions;
 using System.Threading.Tasks;
 using OSK.MessageBus.Local.Options;
 using OSK.MessageBus.Ports;
-using OSK.MessageBus.Options;
 using OSK.MessageBus.Messages.Abstractions;
+using OSK.Hexagonal.MetaData;
 
 namespace OSK.MessageBus.Local.Ports
 {
+    [HexagonalIntegration(HexagonalIntegrationType.LibraryProvided)]
     public interface ILocalMessageBusBuilder
     {
-        ILocalMessageBusBuilder WithMessageBusConfiguration(Action<MessageBusConfigurationOptions> configuration);
-
         ILocalMessageBusBuilder WithLocalBusRuntimeService(Action<LocalMessageBusOptions> configuration);
 
         ILocalMessageBusBuilder AddLocalReceiver<TMessage>(string topicFilter, 

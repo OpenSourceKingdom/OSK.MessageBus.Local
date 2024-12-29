@@ -17,7 +17,6 @@ namespace OSK.MessageBus.Local.Internal.Services
         #region Variables
 
         private readonly List<Action<IMessageReceiverGroupBuilder<ILocalMessageReceiver>>> _receiverConfigurations = [];
-        private Action<MessageBusConfigurationOptions>? _messageBusConfiguration;
         private Action<LocalMessageBusOptions>? _localMessageBusOptions;
 
         #endregion
@@ -63,27 +62,12 @@ namespace OSK.MessageBus.Local.Internal.Services
             return this;
         }
 
-        public ILocalMessageBusBuilder WithMessageBusConfiguration(Action<MessageBusConfigurationOptions> configuration)
-        {
-            _messageBusConfiguration = configuration;
-            return this;
-        }
-
         #endregion
 
         #region Helpers
 
         internal void Apply()
         {
-            if (_messageBusConfiguration is null)
-            {
-                services.AddMessageTransmissions();
-            }
-            else
-            {
-                services.AddMessageTransmissions(_messageBusConfiguration);
-            }
-
             if (_localMessageBusOptions is not null)
             {
                 services.Configure(_localMessageBusOptions);
