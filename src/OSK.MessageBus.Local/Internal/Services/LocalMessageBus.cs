@@ -5,17 +5,15 @@ using OSK.MessageBus.Local.Options;
 using OSK.MessageBus.Local.Ports;
 using OSK.MessageBus.Ports;
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace OSK.MessageBus.Local.Internal.Services
 {
     internal class LocalMessageBus(
-        IMessageEventReceiverManager manager,
-        IEnumerable<MessageBusReceiverConfigurationService> receiverConfigurators,
+        IMessageReceiverManager manager,
         IServiceProvider serviceProvider,
-        IOptions<LocalMessageBusOptions> options) : MessageBusApplicationService(manager, receiverConfigurators), IDisposable
+        IOptions<LocalMessageBusOptions> options) : MessageBusApplicationService(manager), IDisposable
     {
         #region Variables
 
@@ -68,10 +66,10 @@ namespace OSK.MessageBus.Local.Internal.Services
 
         private static async Task RunMessageBusAsync(LocalMessageBusConfiguration configuration)
         {
-            var publisher = configuration.Services.GetRequiredService<ILocalMessageEventPublisher>();
+            var transmitter = configuration.Services.GetRequiredService<ILocalMessageTransmitter>();
             while (!configuration.CancellationToken.IsCancellationRequested)
             {
-                await publisher.SendPublishedMessagesAsync(new SendPublishedMessagesOptions()
+                await transmitter.SendTransmittedMessagesAsync(new SendTransmittedMessagesOptions()
                 {
                     RemoveMessagesFropTopicsWithoutReceivers = configuration.RemoveMessagesFromTopicsWithoutReceivers
                 }, configuration.CancellationToken);

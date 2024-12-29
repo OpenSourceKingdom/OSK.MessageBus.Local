@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Options;
-using Moq;
+﻿using Moq;
 using OSK.MessageBus.Abstractions;
 using OSK.MessageBus.Local.Internal.Services;
 using OSK.MessageBus.Local.Models;
@@ -10,19 +9,19 @@ using Xunit;
 
 namespace OSK.MessageBus.Local.UnitTests.Internal.Services
 {
-    public class LocalMessageEventPublisherTests
+    public class LocalMessageTransmitterTests
     {
         #region Variables
 
-        private LocalMessageEventPublisher _publisher;
+        private readonly LocalMessageTransmitter _transmitter;
 
         #endregion
 
         #region Constructors
 
-        public LocalMessageEventPublisherTests()
+        public LocalMessageTransmitterTests()
         {
-            _publisher = new LocalMessageEventPublisher();
+            _transmitter = new LocalMessageTransmitter();
         }
 
         #endregion
@@ -33,7 +32,7 @@ namespace OSK.MessageBus.Local.UnitTests.Internal.Services
         public void RegisterReceiver_NullReceiver_ThrowsArgumentNullException()
         {
             // Arrange/Act/Assert
-            Assert.Throws<ArgumentNullException>(() => _publisher.RegisterReceiver(null));
+            Assert.Throws<ArgumentNullException>(() => _transmitter.RegisterReceiver(null));
         }
 
         [Fact]
@@ -41,15 +40,15 @@ namespace OSK.MessageBus.Local.UnitTests.Internal.Services
         {
             // Arrange
             var topicId = Guid.NewGuid().ToString();
-            var mockReceiver = new Mock<ILocalMessageEventReceiver>();
+            var mockReceiver = new Mock<ILocalMessageReceiver>();
             mockReceiver.SetupGet(m => m.TopicId)
                 .Returns(topicId);
 
             // Act
-            _publisher.RegisterReceiver(mockReceiver.Object);
+            _transmitter.RegisterReceiver(mockReceiver.Object);
 
             // Assert
-            Assert.True(_publisher._receivers.TryGetValue(topicId, out var receiverSet));
+            Assert.True(_transmitter._receivers.TryGetValue(topicId, out var receiverSet));
             Assert.Single(receiverSet);
 
             var actualReceiver = receiverSet.First();
@@ -64,7 +63,7 @@ namespace OSK.MessageBus.Local.UnitTests.Internal.Services
         public void UnregisterReceiver_NullReceiver_ThrowsArgumentNullException()
         {
             // Arrange/Act/Assert
-            Assert.Throws<ArgumentNullException>(() => _publisher.UnregisterReceiver(null));
+            Assert.Throws<ArgumentNullException>(() => _transmitter.UnregisterReceiver(null));
         }
 
         [Fact]
@@ -72,12 +71,12 @@ namespace OSK.MessageBus.Local.UnitTests.Internal.Services
         {
             // Arrange
             var topicId = Guid.NewGuid().ToString();
-            var mockReceiver = new Mock<ILocalMessageEventReceiver>();
+            var mockReceiver = new Mock<ILocalMessageReceiver>();
             mockReceiver.SetupGet(m => m.TopicId)
                 .Returns(topicId);
 
             // Act/Assert
-            _publisher.UnregisterReceiver(mockReceiver.Object);
+            _transmitter.UnregisterReceiver(mockReceiver.Object);
         }
 
         [Fact]
@@ -85,29 +84,29 @@ namespace OSK.MessageBus.Local.UnitTests.Internal.Services
         {
             // Arrange
             var topicIdA = Guid.NewGuid().ToString();
-            var mockReceiverA = new Mock<ILocalMessageEventReceiver>();
+            var mockReceiverA = new Mock<ILocalMessageReceiver>();
             mockReceiverA.SetupGet(m => m.TopicId)
                 .Returns(topicIdA);
 
-            var mockReceiverB = new Mock<ILocalMessageEventReceiver>();
+            var mockReceiverB = new Mock<ILocalMessageReceiver>();
             mockReceiverB.SetupGet(m => m.TopicId)
                 .Returns(topicIdA);
 
             var topicIdB = Guid.NewGuid().ToString();
-            var mockReceiverC = new Mock<ILocalMessageEventReceiver>();
+            var mockReceiverC = new Mock<ILocalMessageReceiver>();
             mockReceiverC.SetupGet(m => m.TopicId)
                 .Returns(topicIdB);
 
-            _publisher.RegisterReceiver(mockReceiverA.Object);
-            _publisher.RegisterReceiver(mockReceiverB.Object);
-            _publisher.RegisterReceiver(mockReceiverC.Object);
+            _transmitter.RegisterReceiver(mockReceiverA.Object);
+            _transmitter.RegisterReceiver(mockReceiverB.Object);
+            _transmitter.RegisterReceiver(mockReceiverC.Object);
 
             // Act
-            _publisher.UnregisterReceiver(mockReceiverB.Object);
+            _transmitter.UnregisterReceiver(mockReceiverB.Object);
 
             // Assert
-            Assert.True(_publisher._receivers.TryGetValue(topicIdA, out var receiverSetA));
-            Assert.True(_publisher._receivers.TryGetValue(topicIdB, out var receiverSetB));
+            Assert.True(_transmitter._receivers.TryGetValue(topicIdA, out var receiverSetA));
+            Assert.True(_transmitter._receivers.TryGetValue(topicIdB, out var receiverSetB));
             Assert.Single(receiverSetA);
             Assert.Single(receiverSetB);
 
@@ -120,48 +119,48 @@ namespace OSK.MessageBus.Local.UnitTests.Internal.Services
 
         #endregion
 
-        #region PublishAsync
+        #region TransmitAsync
 
         [Fact]
-        public async Task PublishAsync_NullMessage_ThrowsArgumentNullException()
+        public async Task TransmitAsync_NullMessage_ThrowsArgumentNullException()
         {
             // Arrange/Act/Assert
-            await Assert.ThrowsAsync<ArgumentNullException>(() => _publisher.PublishAsync((TestEvent)null, new MessagePublishOptions()));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => _transmitter.TransmitAsync((TestMessage)null, new MessageTransmissionOptions()));
         }
 
         [Fact]
-        public async Task PublishAsync_NullOptions_ThrowsArgumentNullException()
+        public async Task TransmitAsync_NullOptions_ThrowsArgumentNullException()
         {
             // Arrange/Act/Assert
-            await Assert.ThrowsAsync<ArgumentNullException>(() => _publisher.PublishAsync(new TestEvent(), null));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => _transmitter.TransmitAsync(new TestMessage(), null));
         }
 
         [Theory]
         [InlineData(0)]
         [InlineData(2)]
-        public async Task PublishAsync_Valid_StoresLocalMessage(int delayTimeInSeconds)
+        public async Task TransmitAsync_Valid_StoresLocalMessage(int delayTimeInSeconds)
         {
             // Arrange
-            var message = new TestEvent()
+            var message = new TestMessage()
             {
                 TopicId = "Abc"
             };
             var delayTimeSpan = TimeSpan.FromSeconds(delayTimeInSeconds);
 
             // Act
-            await _publisher.PublishAsync(message, new MessagePublishOptions()
+            await _transmitter.TransmitAsync(message, new MessageTransmissionOptions()
             {
                 DelayTimeSpan = delayTimeSpan
             });
 
             // Assert
-            var messages = _publisher.GetPublishedMessages().Where(m => m.MessageEvent.TopicId == message.TopicId);
+            var messages = _transmitter.GetTransmittedMessages().Where(m => m.MessageEvent.TopicId == message.TopicId);
             if (delayTimeInSeconds > 0)
             {
                 Assert.Empty(messages);
                 await Task.Delay(delayTimeSpan);
 
-                messages = _publisher.GetPublishedMessages().Where(m => m.MessageEvent.TopicId == message.TopicId);
+                messages = _transmitter.GetTransmittedMessages().Where(m => m.MessageEvent.TopicId == message.TopicId);
             }
 
             Assert.Single(messages);
@@ -178,105 +177,105 @@ namespace OSK.MessageBus.Local.UnitTests.Internal.Services
             }
         }
 
-        #endregion/ 
+        #endregion
 
         #region SendPublishedMessagesAsync
 
         [Fact]
-        private async Task SendPublishedMessagesAsync_NoMessagesToPublish_NoReceiversCalled_ReturnsSuccessfully()
+        public async Task SendPublishedMessagesAsync_NoMessagesToPublish_NoReceiversCalled_ReturnsSuccessfully()
         {
             // Arrange
             var topicA = Guid.NewGuid().ToString();
-            var mockReceiverA = new Mock<ILocalMessageEventReceiver>();
+            var mockReceiverA = new Mock<ILocalMessageReceiver>();
             mockReceiverA.SetupGet(m => m.TopicId)
                 .Returns(topicA);
 
-            _publisher.RegisterReceiver(mockReceiverA.Object);
+            _transmitter.RegisterReceiver(mockReceiverA.Object);
 
-            await _publisher.PublishAsync(new TestEvent()
+            await _transmitter.TransmitAsync(new TestMessage()
             {
                 TopicId = Guid.NewGuid().ToString()
-            }, new MessagePublishOptions()
+            }, new MessageTransmissionOptions()
             {
                 DelayTimeSpan = TimeSpan.FromMinutes(10)
             });
 
             // Act
-            await _publisher.SendPublishedMessagesAsync(new SendPublishedMessagesOptions()
+            await _transmitter.SendTransmittedMessagesAsync(new SendTransmittedMessagesOptions()
             {
                 RemoveMessagesFropTopicsWithoutReceivers = false
             });
 
             // Assert
-            var messages = _publisher.GetPublishedMessages();
+            var messages = _transmitter.GetTransmittedMessages();
             Assert.Empty(messages);
 
             mockReceiverA.Verify(m => m.ReceiveMessageAsync(It.IsAny<LocalMessage>()), Times.Never);
         }
 
         [Fact]
-        private async Task SendPublishedMessagesAsync_MultipleMessagesToPublish_DoesNotRemoveUnusedEvents_ExpectedReceiversCalled_ReturnsSuccessfully()
+        public async Task SendPublishedMessagesAsync_MultipleMessagesToPublish_DoesNotRemoveUnusedEvents_ExpectedReceiversCalled_ReturnsSuccessfully()
         {
             // Arrange
             var topicA = Guid.NewGuid().ToString();
-            var mockReceiverA = new Mock<ILocalMessageEventReceiver>();
+            var mockReceiverA = new Mock<ILocalMessageReceiver>();
             mockReceiverA.SetupGet(m => m.TopicId)
                 .Returns(topicA);
 
-            var mockReceiverB = new Mock<ILocalMessageEventReceiver>();
+            var mockReceiverB = new Mock<ILocalMessageReceiver>();
             mockReceiverB.SetupGet(m => m.TopicId)
                 .Returns(topicA);
 
             var topicB = Guid.NewGuid().ToString();
-            var mockReceiverC = new Mock<ILocalMessageEventReceiver>();
+            var mockReceiverC = new Mock<ILocalMessageReceiver>();
             mockReceiverC.SetupGet(m => m.TopicId)
                 .Returns(topicB);
 
-            var mockReceiverD = new Mock<ILocalMessageEventReceiver>();
+            var mockReceiverD = new Mock<ILocalMessageReceiver>();
             mockReceiverD.SetupGet(m => m.TopicId)
                 .Returns(Guid.NewGuid().ToString);
 
-            _publisher.RegisterReceiver(mockReceiverA.Object);
-            _publisher.RegisterReceiver(mockReceiverB.Object);
-            _publisher.RegisterReceiver(mockReceiverC.Object);
-            _publisher.RegisterReceiver(mockReceiverD.Object);
+            _transmitter.RegisterReceiver(mockReceiverA.Object);
+            _transmitter.RegisterReceiver(mockReceiverB.Object);
+            _transmitter.RegisterReceiver(mockReceiverC.Object);
+            _transmitter.RegisterReceiver(mockReceiverD.Object);
 
-            await _publisher.PublishAsync(new TestEvent()
+            await _transmitter.TransmitAsync(new TestMessage()
             {
                 TopicId = topicA,
-            }, new MessagePublishOptions()
+            }, new MessageTransmissionOptions()
             {
                 DelayTimeSpan = TimeSpan.FromMinutes(10)
             });
-            await _publisher.PublishAsync(new TestEvent()
+            await _transmitter.TransmitAsync(new TestMessage()
             {
                 TopicId = topicA,
-            }, new MessagePublishOptions());
+            }, new MessageTransmissionOptions());
 
-            await _publisher.PublishAsync(new TestEvent()
+            await _transmitter.TransmitAsync(new TestMessage()
             {
                 TopicId = topicB,
-            }, new MessagePublishOptions());
+            }, new MessageTransmissionOptions());
 
             var topicC = Guid.NewGuid().ToString();
-            await _publisher.PublishAsync(new TestEvent()
+            await _transmitter.TransmitAsync(new TestMessage()
             {
                 TopicId = topicC,
-            }, new MessagePublishOptions());
+            }, new MessageTransmissionOptions());
             
-            Assert.Equal(3, _publisher.GetPublishedMessages().Count());
+            Assert.Equal(3, _transmitter.GetTransmittedMessages().Count());
 
             // Act
-            await _publisher.SendPublishedMessagesAsync(new SendPublishedMessagesOptions()
+            await _transmitter.SendTransmittedMessagesAsync(new SendTransmittedMessagesOptions()
             {
                 RemoveMessagesFropTopicsWithoutReceivers = false
             });
 
             // Assert
-            var messagesToPublish = _publisher.GetPublishedMessages().ToList();
+            var messagesToPublish = _transmitter.GetTransmittedMessages().ToList();
             Assert.Single(messagesToPublish);
 
-            var actualMessages = _publisher._messageEvents.SelectMany(topics => topics.Value.Values).ToList();
+            var actualMessages = _transmitter._messageEvents.SelectMany(topics => topics.Value.Values).ToList();
             Assert.Equal(2, actualMessages.Count);
             Assert.Single(actualMessages, message => message.MessageEvent.TopicId == topicA);
             Assert.Single(actualMessages, message => message.MessageEvent.TopicId == topicC);
@@ -288,68 +287,68 @@ namespace OSK.MessageBus.Local.UnitTests.Internal.Services
         }
 
         [Fact]
-        private async Task SendPublishedMessagesAsync_MultipleMessagesToPublish_DoesRemoveUnusedEvents_ExpectedReceiversCalled_ReturnsSuccessfully()
+        public async Task SendPublishedMessagesAsync_MultipleMessagesToPublish_DoesRemoveUnusedEvents_ExpectedReceiversCalled_ReturnsSuccessfully()
         {
             // Arrange
             var topicA = Guid.NewGuid().ToString();
-            var mockReceiverA = new Mock<ILocalMessageEventReceiver>();
+            var mockReceiverA = new Mock<ILocalMessageReceiver>();
             mockReceiverA.SetupGet(m => m.TopicId)
                 .Returns(topicA);
 
-            var mockReceiverB = new Mock<ILocalMessageEventReceiver>();
+            var mockReceiverB = new Mock<ILocalMessageReceiver>();
             mockReceiverB.SetupGet(m => m.TopicId)
                 .Returns(topicA);
 
             var topicB = Guid.NewGuid().ToString();
-            var mockReceiverC = new Mock<ILocalMessageEventReceiver>();
+            var mockReceiverC = new Mock<ILocalMessageReceiver>();
             mockReceiverC.SetupGet(m => m.TopicId)
                 .Returns(topicB);
 
-            var mockReceiverD = new Mock<ILocalMessageEventReceiver>();
+            var mockReceiverD = new Mock<ILocalMessageReceiver>();
             mockReceiverD.SetupGet(m => m.TopicId)
                 .Returns(Guid.NewGuid().ToString);
 
-            _publisher.RegisterReceiver(mockReceiverA.Object);
-            _publisher.RegisterReceiver(mockReceiverB.Object);
-            _publisher.RegisterReceiver(mockReceiverC.Object);
-            _publisher.RegisterReceiver(mockReceiverD.Object);
+            _transmitter.RegisterReceiver(mockReceiverA.Object);
+            _transmitter.RegisterReceiver(mockReceiverB.Object);
+            _transmitter.RegisterReceiver(mockReceiverC.Object);
+            _transmitter.RegisterReceiver(mockReceiverD.Object);
 
-            await _publisher.PublishAsync(new TestEvent()
+            await _transmitter.TransmitAsync(new TestMessage()
             {
                 TopicId = topicA,
-            }, new MessagePublishOptions()
+            }, new MessageTransmissionOptions()
             {
                 DelayTimeSpan = TimeSpan.FromMinutes(10)
             });
-            await _publisher.PublishAsync(new TestEvent()
+            await _transmitter.TransmitAsync(new TestMessage()
             {
                 TopicId = topicA,
-            }, new MessagePublishOptions());
+            }, new MessageTransmissionOptions());
 
-            await _publisher.PublishAsync(new TestEvent()
+            await _transmitter.TransmitAsync(new TestMessage()
             {
                 TopicId = topicB,
-            }, new MessagePublishOptions());
+            }, new MessageTransmissionOptions());
 
             var topicC = Guid.NewGuid().ToString();
-            await _publisher.PublishAsync(new TestEvent()
+            await _transmitter.TransmitAsync(new TestMessage()
             {
                 TopicId = topicC,
-            }, new MessagePublishOptions());
+            }, new MessageTransmissionOptions());
 
-            Assert.Equal(3, _publisher.GetPublishedMessages().Count());
+            Assert.Equal(3, _transmitter.GetTransmittedMessages().Count());
 
             // Act
-            await _publisher.SendPublishedMessagesAsync(new SendPublishedMessagesOptions()
+            await _transmitter.SendTransmittedMessagesAsync(new SendTransmittedMessagesOptions()
             {
                 RemoveMessagesFropTopicsWithoutReceivers = true
             });
 
             // Assert
-            var messagesToPublish = _publisher.GetPublishedMessages().ToList();
+            var messagesToPublish = _transmitter.GetTransmittedMessages().ToList();
             Assert.Empty(messagesToPublish);
 
-            var actualMessages = _publisher._messageEvents.SelectMany(topics => topics.Value.Values).ToList();
+            var actualMessages = _transmitter._messageEvents.SelectMany(topics => topics.Value.Values).ToList();
             Assert.Single(actualMessages);
             Assert.Single(actualMessages, message => message.MessageEvent.TopicId == topicA);
             
@@ -358,7 +357,6 @@ namespace OSK.MessageBus.Local.UnitTests.Internal.Services
             mockReceiverC.Verify(m => m.ReceiveMessageAsync(It.IsAny<LocalMessage>()), Times.Once);
             mockReceiverD.Verify(m => m.ReceiveMessageAsync(It.IsAny<LocalMessage>()), Times.Never);
         }
-
 
         #endregion
     }
