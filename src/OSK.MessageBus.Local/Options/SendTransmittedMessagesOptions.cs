@@ -1,6 +1,6 @@
 ﻿namespace OSK.MessageBus.Local.Options
 {
-    public class SendPublishedMessagesOptions
+    public class SendTransmittedMessagesOptions
     {
         public bool RemoveMessagesFropTopicsWithoutReceivers { get; set; }
     }

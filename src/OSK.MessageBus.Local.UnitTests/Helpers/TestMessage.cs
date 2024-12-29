@@ -1,8 +1,8 @@
-﻿using OSK.MessageBus.Events.Abstractions;
+﻿using OSK.MessageBus.Messages.Abstractions;
 
 namespace OSK.MessageBus.Local.UnitTests.Helpers
 {
-    public class TestEvent : IMessageEvent
+    public class TestMessage : IMessage
     {
         public string TopicId { get; set; }
     }

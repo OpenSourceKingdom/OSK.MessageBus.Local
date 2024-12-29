@@ -2,35 +2,35 @@
 using System;
 using System.Threading.Tasks;
 using OSK.MessageBus.Models;
-using OSK.MessageBus.Events.Abstractions;
 using OSK.MessageBus.Local.Models;
+using OSK.MessageBus.Messages.Abstractions;
 
 namespace OSK.MessageBus.Local.Internal.Services
 {
-    internal class LocalMessageEventReceiver<TMessage>(string subscriptionId, MessageEventDelegate eventDelegate,
-        ILocalMessageEventPublisher publisher, IServiceProvider serviceProvider)
-        : MessageEventReceiverBase(eventDelegate, serviceProvider), ILocalMessageEventReceiver
-        where TMessage : IMessageEvent
+    internal class LocalMessageEventReceiver<TMessage>(string receiverId, string topicId, MessageTransmissionDelegate transmissionDelegate,
+        ILocalMessageTransmitter transmitter, IServiceProvider serviceProvider)
+        : MessageEventReceiverBase(receiverId, transmissionDelegate, serviceProvider), ILocalMessageReceiver
+        where TMessage : IMessage
     {
-        #region MessageReceiverBase
+        #region ILocalMessageEventReceiver
 
-        public string TopicId => subscriptionId;
+        public string TopicId => topicId;
 
         public override void Dispose()
         {
-            publisher.UnregisterReceiver(this);
+            transmitter.UnregisterReceiver(this);
         }
 
         public override void Start()
         {
-            publisher.RegisterReceiver(this);
+            transmitter.RegisterReceiver(this);
         }
 
         public Task ReceiveMessageAsync(LocalMessage message)
         {
-            if (message is TMessage typedMessage)
+            if (message.MessageEvent is TMessage typedMessage)
             {
-                return HandleEventAsync(typedMessage, message);
+                return ProcessTransmissionAsync(typedMessage, message);
             }
 
             return Task.CompletedTask;

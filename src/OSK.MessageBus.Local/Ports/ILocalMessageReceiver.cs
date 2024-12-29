@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 
 namespace OSK.MessageBus.Local.Ports
 {
-    [HexagonalPort(HexagonalPort.Primary)]
-    public interface ILocalMessageEventReceiver: IMessageEventReceiver
+    [HexagonalIntegration(HexagonalIntegrationType.LibraryProvided)]
+    public interface ILocalMessageReceiver: IMessageReceiver
     {
         string TopicId { get; }
 
