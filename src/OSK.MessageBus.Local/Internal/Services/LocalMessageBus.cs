@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using OSK.MessageBus.Application;
 using OSK.MessageBus.Local.Options;
 using OSK.MessageBus.Local.Ports;
-using OSK.MessageBus.Ports;
+using OSK.Transmissions.Application;
+using OSK.Transmissions.Ports;
 using System;
 using System.Threading;
 using System.Threading.Tasks;

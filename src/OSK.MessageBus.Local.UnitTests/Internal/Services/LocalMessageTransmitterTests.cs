@@ -1,10 +1,10 @@
 ﻿using Moq;
-using OSK.MessageBus.Abstractions;
 using OSK.MessageBus.Local.Internal.Services;
 using OSK.MessageBus.Local.Models;
 using OSK.MessageBus.Local.Options;
 using OSK.MessageBus.Local.Ports;
 using OSK.MessageBus.Local.UnitTests.Helpers;
+using OSK.Transmissions.Abstractions;
 using Xunit;
 
 namespace OSK.MessageBus.Local.UnitTests.Internal.Services

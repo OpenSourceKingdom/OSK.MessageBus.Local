@@ -1,6 +1,6 @@
 ﻿using OSK.Hexagonal.MetaData;
 using OSK.MessageBus.Local.Models;
-using OSK.MessageBus.Ports;
+using OSK.Transmissions.Ports;
 using System.Threading.Tasks;
 
 namespace OSK.MessageBus.Local.Ports

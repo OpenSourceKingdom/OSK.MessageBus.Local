@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
-using OSK.MessageBus.Abstractions;
 using OSK.MessageBus.Local.Options;
 using OSK.MessageBus.Local.Ports;
-using OSK.MessageBus.Messages.Abstractions;
-using OSK.MessageBus.Options;
-using OSK.MessageBus.Ports;
+using OSK.Transmissions;
+using OSK.Transmissions.Abstractions;
+using OSK.Transmissions.Messages.Abstractions;
+using OSK.Transmissions.Ports;
 
 namespace OSK.MessageBus.Local.Internal.Services
 {
@@ -29,7 +29,7 @@ namespace OSK.MessageBus.Local.Internal.Services
         {
             _receiverConfigurations.Add(transmissionBuilder =>
             {
-                transmissionBuilder.AddMessageEventReceiver<LocalMessageEventReceiver<TMessage>>(
+                transmissionBuilder.AddMessageReceiver<LocalMessageReceiver<TMessage>>(
                     Guid.NewGuid().ToString(), [topicFilter], receiverBuilder =>
                     {
                         receiverBuilder.UseHandler(handler);
@@ -46,7 +46,7 @@ namespace OSK.MessageBus.Local.Internal.Services
         {
             _receiverConfigurations.Add(transmissionBuilder =>
             {
-                transmissionBuilder.AddMessageEventReceiver<LocalMessageEventReceiver<TMessage>>(
+                transmissionBuilder.AddMessageReceiver<LocalMessageReceiver<TMessage>>(
                     Guid.NewGuid().ToString(), [topicFilter], receiverBuilder =>
                     {
                         receiverBuilder.UseHandler<TMessage, THandler>();

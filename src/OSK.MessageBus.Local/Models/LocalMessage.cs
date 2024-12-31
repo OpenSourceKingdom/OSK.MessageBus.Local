@@ -1,4 +1,4 @@
-﻿using OSK.MessageBus.Messages.Abstractions;
+﻿using OSK.Transmissions.Messages.Abstractions;
 using System;
 
 namespace OSK.MessageBus.Local.Models
