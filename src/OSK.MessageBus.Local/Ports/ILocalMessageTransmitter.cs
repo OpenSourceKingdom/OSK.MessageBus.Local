@@ -1,6 +1,6 @@
 ﻿using OSK.Hexagonal.MetaData;
-using OSK.MessageBus.Abstractions;
 using OSK.MessageBus.Local.Options;
+using OSK.Transmissions.Abstractions;
 using System.Threading;
 using System.Threading.Tasks;
 

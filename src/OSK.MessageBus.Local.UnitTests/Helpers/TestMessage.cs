@@ -1,4 +1,4 @@
-﻿using OSK.MessageBus.Messages.Abstractions;
+﻿using OSK.Transmissions.Messages.Abstractions;
 
 namespace OSK.MessageBus.Local.UnitTests.Helpers
 {

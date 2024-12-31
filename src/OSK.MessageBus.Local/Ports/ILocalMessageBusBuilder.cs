@@ -1,10 +1,10 @@
 ﻿using System;
-using OSK.MessageBus.Abstractions;
 using System.Threading.Tasks;
 using OSK.MessageBus.Local.Options;
-using OSK.MessageBus.Ports;
-using OSK.MessageBus.Messages.Abstractions;
 using OSK.Hexagonal.MetaData;
+using OSK.Transmissions.Ports;
+using OSK.Transmissions.Abstractions;
+using OSK.Transmissions.Messages.Abstractions;
 
 namespace OSK.MessageBus.Local.Ports
 {

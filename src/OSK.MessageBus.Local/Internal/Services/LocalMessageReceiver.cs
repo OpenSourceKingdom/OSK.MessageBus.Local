@@ -1,15 +1,16 @@
 ﻿using OSK.MessageBus.Local.Ports;
 using System;
 using System.Threading.Tasks;
-using OSK.MessageBus.Models;
 using OSK.MessageBus.Local.Models;
-using OSK.MessageBus.Messages.Abstractions;
+using OSK.Transmissions;
+using OSK.Transmissions.Messages.Abstractions;
+using OSK.Transmissions.Models;
 
 namespace OSK.MessageBus.Local.Internal.Services
 {
-    internal class LocalMessageEventReceiver<TMessage>(string receiverId, string topicId, MessageTransmissionDelegate transmissionDelegate,
+    internal class LocalMessageReceiver<TMessage>(string receiverId, string topicId, MessageTransmissionDelegate transmissionDelegate,
         ILocalMessageTransmitter transmitter, IServiceProvider serviceProvider)
-        : MessageEventReceiverBase(receiverId, transmissionDelegate, serviceProvider), ILocalMessageReceiver
+        : MessageReceiverBase(receiverId, transmissionDelegate, serviceProvider), ILocalMessageReceiver
         where TMessage : IMessage
     {
         #region ILocalMessageEventReceiver

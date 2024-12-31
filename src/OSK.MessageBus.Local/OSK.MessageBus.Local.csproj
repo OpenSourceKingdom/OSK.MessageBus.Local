@@ -22,8 +22,8 @@
 
 	<ItemGroup>
 		<None Include="..\..\README.md" Pack="true" PackagePath="\" />
-		<PackageReference Include="OSK.MessageBus.Application" Version="0.2.0" />
-		<PackageReference Include="OSK.MessageBus" Version="0.2.0" />
+		<PackageReference Include="OSK.Transmissions.Application" Version="0.3.0" />
+		<PackageReference Include="OSK.Transmissions" Version="0.3.0" />
 	</ItemGroup>
 
 </Project>
